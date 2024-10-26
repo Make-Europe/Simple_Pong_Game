@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './PongGame.css';
 
 const PongGame = ({ mode, onReturnToMenu }) => {
@@ -10,7 +10,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [lineCracks, setLineCracks] = useState([]);
 
-  const ballRadius = 15; // Ball radius (30px diameter)
+  const ballRadius = 15;
 
   const togglePause = () => {
     setIsPaused((prev) => !prev);
@@ -24,7 +24,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     ctx.closePath();
   };
 
-  const drawPaddle = (ctx, paddle, playerScore) => {
+  const drawPaddle = useCallback((ctx, paddle, playerScore) => {
     ctx.beginPath();
     ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
     ctx.fillStyle = '#0095DD';
@@ -35,22 +35,14 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
-  };
+  }, []);
 
-  const drawScore = (ctx, score) => {
-    ctx.font = '24px Arial';
-    ctx.fillStyle = '#0095DD';
-    const scoreText = mode === 'solo' ? `Score: ${score.player1}` : `${score.player2} : ${score.player1}`;
-    ctx.fillText(scoreText, 280, 450);
-  };
-
-  const drawBoundaryLines = (ctx) => {
+  const drawBoundaryLines = useCallback((ctx) => {
     const lineWidth = 600;
     ctx.strokeStyle = 'orange';
     ctx.lineWidth = 3;
 
     ctx.beginPath();
-    // Draw bottom boundary line with cracks
     for (let x = 0; x < lineWidth; x += 3) {
       if (!lineCracks.some(crack => crack.y === 'bottom' && x >= crack.x && x < crack.x + crack.width)) {
         ctx.moveTo(x, paddle1.y + 12);
@@ -58,7 +50,6 @@ const PongGame = ({ mode, onReturnToMenu }) => {
       }
     }
 
-    // Draw top boundary line only if not in solo mode
     if (mode !== 'solo') {
       for (let x = 0; x < lineWidth; x += 3) {
         if (!lineCracks.some(crack => crack.y === 'top' && x >= crack.x && x < crack.x + crack.width)) {
@@ -69,63 +60,58 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     }
     ctx.stroke();
     ctx.closePath();
-  };
+  }, [lineCracks, mode, paddle1.y, paddle2.y]);
 
-  const expandCrack = (y, x) => {
-    setLineCracks((prevCracks) => {
-      const crackIndex = prevCracks.findIndex(crack => crack.y === y && x >= crack.x && x <= crack.x + crack.width);
-      if (crackIndex >= 0) {
-        // Expand existing crack
-        const newCracks = [...prevCracks];
-        newCracks[crackIndex] = { ...newCracks[crackIndex], width: newCracks[crackIndex].width + 5 };
-        return newCracks;
-      } else {
-        // Add a new crack
-        return [...prevCracks, { x, y, width: 5 }];
-      }
-    });
-  };
+  const drawScore = useCallback((ctx) => {
+    ctx.font = '24px Arial';
+    ctx.fillStyle = '#0095DD';
+    const scoreText = mode === 'solo' ? `Score: ${score.player1}` : `${score.player2} : ${score.player1}`;
+    ctx.fillText(scoreText, 280, 450);
+  }, [mode, score]);
 
-  const moveBall = (ball, paddle1, paddle2) => {
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'ArrowLeft') setPaddle1((paddle) => ({ ...paddle, x: Math.max(paddle.x - 25, 0) }));
+    else if (e.key === 'ArrowRight') setPaddle1((paddle) => ({ ...paddle, x: Math.min(paddle.x + 25, 600 - paddle.width) }));
+    else if (e.key === 'a' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.max(paddle.x - 25, 0) }));
+    else if (e.key === 'd' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.min(paddle.x + 25, 600 - paddle.width) }));
+    else if (e.key === ' ') togglePause();
+  }, [mode]);
+
+  const moveBall = useCallback((ball, paddle1, paddle2) => {
     let newBall = { ...ball };
     newBall.x += newBall.dx;
     newBall.y += newBall.dy;
 
-    // Ball collision with side walls
     if (newBall.x + newBall.dx > 600 || newBall.x + newBall.dx < 0) {
       newBall.dx = -newBall.dx;
     }
 
-    // Ball bounce off upper boundary in solo mode
     if (mode === 'solo' && newBall.y + newBall.dy < 0) {
       newBall.dy = -newBall.dy;
     }
 
-    // Check for pass-through or bounce on the bottom boundary
     if (newBall.y + newBall.dy > paddle1.y + 12 && newBall.y < paddle1.y + 15) {
       const crack = lineCracks.find(crack => crack.y === 'bottom' && newBall.x >= crack.x && newBall.x < crack.x + crack.width);
-      if (crack && crack.width >= 25) {  // Allow pass-through if crack is 25px or wider
+      if (crack && crack.width >= 25) {
         alert("Game Over! Player 1 loses.");
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
-        expandCrack('bottom', newBall.x);
+        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'bottom', width: 5 }]);
       }
     }
 
-    // Check for pass-through or bounce on the top boundary (non-solo mode only)
     if (mode !== 'solo' && newBall.y + newBall.dy < paddle2.y + paddle2.height - 8 && newBall.y > paddle2.y + paddle2.height - 12) {
       const crack = lineCracks.find(crack => crack.y === 'top' && newBall.x >= crack.x && newBall.x < crack.x + crack.width);
-      if (crack && crack.width >= 25) {  // Allow pass-through if crack is 25px or wider
+      if (crack && crack.width >= 25) {
         alert("Game Over! Player 2 loses.");
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
-        expandCrack('top', newBall.x);
+        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'top', width: 5 }]);
       }
     }
 
-    // Paddle collision logic
     if (newBall.y + newBall.dy > paddle1.y && newBall.x > paddle1.x && newBall.x < paddle1.x + paddle1.width) {
       newBall.dy = -newBall.dy;
       newBall.y = paddle1.y - 10;
@@ -138,23 +124,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     }
 
     return newBall;
-  };
-
-  const movePaddle = (paddleSetter, direction) => {
-    const moveStep = 25;
-    paddleSetter((prevPaddle) => ({
-      ...prevPaddle,
-      x: Math.max(0, Math.min(prevPaddle.x + direction * moveStep, 600 - prevPaddle.width)),
-    }));
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'ArrowLeft') movePaddle(setPaddle1, -1);
-    else if (e.key === 'ArrowRight') movePaddle(setPaddle1, 1);
-    else if (e.key === 'a' && mode !== 'solo') movePaddle(setPaddle2, -1);
-    else if (e.key === 'd' && mode !== 'solo') movePaddle(setPaddle2, 1);
-    else if (e.key === ' ') togglePause();
-  };
+  }, [mode, lineCracks, onReturnToMenu]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -169,7 +139,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
         drawBall(ctx, ball);
         drawPaddle(ctx, paddle1, score.player1);
         if (mode !== 'solo') drawPaddle(ctx, paddle2, score.player2);
-        drawScore(ctx, score);
+        drawScore(ctx);
         drawBoundaryLines(ctx);
       }
     }, 10);
@@ -178,22 +148,22 @@ const PongGame = ({ mode, onReturnToMenu }) => {
       clearInterval(interval);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [ball, paddle1, paddle2, score, isPaused, mode, lineCracks]);
+  }, [ball, paddle1, paddle2, score, isPaused, mode, lineCracks, handleKeyDown, moveBall, drawScore, drawBoundaryLines, drawPaddle]);
 
   return (
     <div className="pong-container">
       {mode !== 'solo' && (
         <div className="control-icons-container control-icons-top">
-          <span className="control-icon" onClick={() => movePaddle(setPaddle2, -1)}>⬅️</span>
-          <span className="control-icon" onClick={() => movePaddle(setPaddle2, 1)}>➡️</span>
+          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.max(prev.x - 25, 0) }))}>⬅️</span>
+          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.min(prev.x + 25, 600 - paddle2.width) }))}>➡️</span>
         </div>
       )}
 
       <canvas ref={canvasRef} width="600" height="900" />
 
       <div className="control-icons-container control-icons-bottom">
-        <span className="control-icon" onClick={() => movePaddle(setPaddle1, -1)}>⬅️</span>
-        <span className="control-icon" onClick={() => movePaddle(setPaddle1, 1)}>➡️</span>
+        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.max(prev.x - 25, 0) }))}>⬅️</span>
+        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.min(prev.x + 25, 600 - paddle1.width) }))}>➡️</span>
       </div>
 
       {isPaused && (
