@@ -5,11 +5,12 @@ const CoverPage = ({ onSelectMode }) => {
   return (
     <div className="cover-page">
       <h1>Welcome to Pong on $TON</h1>
-      <p>Select your playing mode to play:</p>
+      <p>Select your playing mode:</p>
       <div className="mode-buttons">
-        <button onClick={() => onSelectMode('solo')}>Solo</button>
-        <button onClick={() => onSelectMode('shared')}>Two Players</button>
-        <button onClick={() => onSelectMode('online (coming soon)')}>Online</button>
+        <button className="mode-button" onClick={() => onSelectMode('solo')}>Solo</button>
+        <button className="mode-button" onClick={() => onSelectMode('shared')}>Two Players</button>
+        <button className="mode-button disabled" disabled>Online (coming soon)</button>
+        <button className="mode-button disabled" disabled>Connect Wallet</button>
       </div>
     </div>
   );

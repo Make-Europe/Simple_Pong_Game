@@ -20,41 +20,34 @@ canvas {
   height: auto;
 }
 
-/* Centered Controls with Thumb-Friendly Spacing */
+/* Control Icons Inside Canvas with Horizontal Centering */
 .control-icons-container {
+  position: absolute;
   display: flex;
-  justify-content: center;
   gap: 50px; /* Thumb-sized spacing between arrows */
   width: 100%;
-  max-width: 600px;
-  padding: 1rem 0;
+  justify-content: center;
+  opacity: 0.7; /* 70% opacity */
 }
 
 .control-icon {
-  font-size: 2rem; /* Increased size for better visibility */
+  font-size: 2rem;
   cursor: pointer;
   color: #0095DD;
   user-select: none;
+  padding: 0.5rem;
 }
 
-/* Floating Pause Button */
-.pause-button {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  padding: 8px 16px;
-  font-size: 1rem;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
+/* Specific positioning for top and bottom arrow containers */
+.control-icons-top {
+  top: 20px; /* Adjust as needed for spacing from the top */
 }
 
-.pause-button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+.control-icons-bottom {
+  bottom: 20px; /* Adjust as needed for spacing from the bottom */
 }
+
+/* Fullscreen Pause Overlay */
 .pause-overlay {
   position: absolute;
   top: 0;
@@ -67,7 +60,7 @@ canvas {
   align-items: center;
   justify-content: center;
   color: white;
-  z-index: 10;
+  z-index: 10; /* Ensure it appears above everything else */
 }
 
 .pause-overlay h2 {
@@ -90,4 +83,3 @@ canvas {
 .pause-overlay button:hover {
   background-color: #007bb5;
 }
-
