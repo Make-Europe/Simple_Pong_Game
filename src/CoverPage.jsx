@@ -15,7 +15,6 @@ const CoverPage = ({ onSelectMode }) => {
         <button className="mode-button" onClick={() => onSelectMode('solo')}>Solo</button>
         <button className="mode-button" onClick={() => onSelectMode('shared')}>Two Players</button>
         <button className="mode-button disabled" disabled>Online (coming soon)</button>
-        <button className="mode-button disabled" disabled>Connect Wallet</button>
       </div>
     </div>
   );
