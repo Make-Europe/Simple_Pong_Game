@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PongGame.css';
-import WebApp from '@twa-dev/sdk'
+// import WebApp from '@twa-dev/sdk'
 
 const PongGame = () => {
   const canvasRef = useRef(null);
