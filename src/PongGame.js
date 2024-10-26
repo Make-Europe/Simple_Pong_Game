@@ -122,7 +122,7 @@ const PongGame = () => {
     };
   }, [ball, paddle1, paddle2, score, isPaused]);
 
-  WebApp.showAlert("aaa")
+  // WebApp.showAlert("aaa")
 
   return (
     <div className="pong-container">
