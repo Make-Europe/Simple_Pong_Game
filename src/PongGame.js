@@ -60,7 +60,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     }
     ctx.stroke();
     ctx.closePath();
-  }, [lineCracks, mode, paddle1.y, paddle2.y]);
+  }, [lineCracks, mode, paddle1.y, paddle2.y, paddle2.height]);
 
   const drawScore = useCallback((ctx) => {
     ctx.font = '24px Arial';
