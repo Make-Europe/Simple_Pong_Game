@@ -2,6 +2,9 @@
 
 This is a simple Pong game implemented in React. The game features two paddles and a ball, and players score points by bouncing the ball off their paddles.
 
+The game is available under [this address](https://make-europe.github.io/Simple_Pong_Game/)
+
+
 ## Features
 
 - Two player paddles: one at the bottom and one at the top.
