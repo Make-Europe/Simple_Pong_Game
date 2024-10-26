@@ -12,7 +12,7 @@ const PongGame = () => {
 
   const drawBall = (ctx, ball) => {
     ctx.beginPath();
-    ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2);
+    ctx.arc(ball.x, ball.y, 15, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.closePath();
@@ -23,8 +23,8 @@ const PongGame = () => {
     ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
     ctx.fillStyle = '#0095DD';
     ctx.fill();
-    ctx.strokeStyle = playerScore >= 1000 ? 'yellow' : playerScore >= 250 ? 'purple' : playerScore >= 100 ? 'white' : 'transparent';
-    ctx.lineWidth = playerScore >= 1000 ? 6 : playerScore >= 250 ? 4 : playerScore >= 100 ? 2 : 0;
+    ctx.strokeStyle = playerScore >= 50 ? 'white' : playerScore >= 25 ? 'yellow' : playerScore >= 10 ? 'white' : 'transparent';
+    ctx.lineWidth = playerScore >= 50 ? 9 : playerScore >= 25 ? 6 : playerScore >= 10 ? 4 : 0;
     ctx.stroke();
     ctx.closePath();
   };
