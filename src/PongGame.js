@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PongGame.css';
-// import WebApp from '@twa-dev/sdk'
 
 const PongGame = () => {
   const canvasRef = useRef(null);
@@ -23,8 +22,8 @@ const PongGame = () => {
     ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
     ctx.fillStyle = '#0095DD';
     ctx.fill();
-    ctx.strokeStyle = playerScore >= 50 ? 'white' : playerScore >= 25 ? 'yellow' : playerScore >= 10 ? 'white' : 'transparent';
-    ctx.lineWidth = playerScore >= 50 ? 9 : playerScore >= 25 ? 6 : playerScore >= 10 ? 4 : 0;
+    ctx.strokeStyle = playerScore >= 120 ? 'purple' : playerScore >= 50 ? 'white' : playerScore >= 25 ? 'yellow' : playerScore >= 10 ? 'white' : 'transparent';
+    ctx.lineWidth = playerScore >= 120 ? 11 : playerScore >= 50 ? 9 : playerScore >= 25 ? 6 : playerScore >= 10 ? 4 : 0;
     ctx.stroke();
     ctx.closePath();
   };
@@ -74,35 +73,27 @@ const PongGame = () => {
     return newBall;
   };
 
-  const handleKeyDown = (e) => {
-    // Increase the move step from 20 to 25 for 25% more speed
-    const moveStep = 25;  
-    if (e.key === 'ArrowLeft') {
-      setPaddle1((prevPaddle) => ({ ...prevPaddle, x: Math.max(prevPaddle.x - moveStep, 0) }));
-    } else if (e.key === 'ArrowRight') {
-      setPaddle1((prevPaddle) => ({ ...prevPaddle, x: Math.min(prevPaddle.x + moveStep, 600 - prevPaddle.width) }));
-    } else if (e.key === 'a') {
-      setPaddle2((prevPaddle) => ({ ...prevPaddle, x: Math.max(prevPaddle.x - moveStep, 0) }));
-    } else if (e.key === 'd') {
-      setPaddle2((prevPaddle) => ({ ...prevPaddle, x: Math.min(prevPaddle.x + moveStep, 600 - prevPaddle.width) }));
-    }
-  };
-  
-  const handleTouchMove = (e) => {
-    const touchX = e.touches[0].clientX;
-    setPaddle1((prevPaddle) => ({
+  const movePaddle = (paddleSetter, direction) => {
+    const moveStep = 25;
+    paddleSetter((prevPaddle) => ({
       ...prevPaddle,
-      x: Math.max(Math.min(touchX - canvasRef.current.offsetLeft - prevPaddle.width / 2, 600 - prevPaddle.width), 0),
+      x: Math.max(0, Math.min(prevPaddle.x + direction * moveStep, 600 - prevPaddle.width)),
     }));
   };
-  
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') movePaddle(setPaddle1, -1);
+    else if (e.key === 'ArrowRight') movePaddle(setPaddle1, 1);
+    else if (e.key === 'a') movePaddle(setPaddle2, -1);
+    else if (e.key === 'd') movePaddle(setPaddle2, 1);
+    else if (e.key === ' ') setIsPaused((prev) => !prev); // Toggle pause on Spacebar
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
     window.addEventListener('keydown', handleKeyDown);
-    canvas.addEventListener('touchmove', handleTouchMove);
 
     const interval = setInterval(() => {
       if (!isPaused) {
@@ -118,22 +109,29 @@ const PongGame = () => {
     return () => {
       clearInterval(interval);
       window.removeEventListener('keydown', handleKeyDown);
-      canvas.removeEventListener('touchmove', handleTouchMove);
     };
   }, [ball, paddle1, paddle2, score, isPaused]);
 
-  // WebApp.showAlert("aaa")
-
   return (
     <div className="pong-container">
+      {/* Player 2 Controls (Top Paddle) */}
+      <div className="control-icons-container">
+        <span className="control-icon" onClick={() => movePaddle(setPaddle2, -1)}>⬅️</span>
+        <span className="control-icon" onClick={() => movePaddle(setPaddle2, 1)}>➡️</span>
+      </div>
+
+      <canvas ref={canvasRef} width="600" height="900" />
+
+      {/* Player 1 Controls (Bottom Paddle) */}
+      <div className="control-icons-container">
+        <span className="control-icon" onClick={() => movePaddle(setPaddle1, -1)}>⬅️</span>
+        <span className="control-icon" onClick={() => movePaddle(setPaddle1, 1)}>➡️</span>
+      </div>
+
+      {/* Floating Pause Button */}
       <button onClick={() => setIsPaused(!isPaused)} className="pause-button">
         {isPaused ? 'Resume' : 'Pause'}
       </button>
-      <canvas ref={canvasRef} width="600" height="900" />
-      <div className="control-text top-left">(←A)</div>
-      <div className="control-text top-right">(D→)</div>
-      <div className="control-text bottom-left">(←)</div>
-      <div className="control-text bottom-right">(→)</div>
     </div>
   );
 };
