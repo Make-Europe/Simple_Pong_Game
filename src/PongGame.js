@@ -13,7 +13,7 @@ const PongGame = () => {
   const drawBall = (ctx, ball) => {
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2);
-    ctx.fillStyle = '#0095DD';
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.closePath();
   };

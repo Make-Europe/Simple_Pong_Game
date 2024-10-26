@@ -1,12 +1,16 @@
 .pong-container {
   position: relative;
-  width: 600px;
-  height: 900px;
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  max-height: 900px;
   margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 canvas {
-  border: 5px solid #000;
+  border: 8px solid #58ecec;
   display: block;
   margin: 0 auto;
   max-width: 100%;
@@ -26,7 +30,7 @@ canvas {
 .control-text {
   position: absolute;
   font-size: 14px;
-  color: #0095DD;
+  color: #ecf2f4;
   font-weight: bold;
 }
 
