@@ -4,17 +4,18 @@ import './PongGame.css';
 const PongGame = ({ mode, onReturnToMenu }) => {
   const canvasRef = useRef(null);
   const [ball, setBall] = useState({ x: 300, y: 450, dx: 4, dy: 4 });
-  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 100, height: 30 });
-  const [paddle2, setPaddle2] = useState({ x: 250, y: 0, width: 100, height: 30 });
+  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 100, height: 33 });
+  const [paddle2, setPaddle2] = useState({ x: 250, y: 0, width: 100, height: 33 });
   const [score, setScore] = useState({ player1: 0, player2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [lineCracks, setLineCracks] = useState([]);
+  const [touchStartX, setTouchStartX] = useState(null);
 
   const ballRadius = 15;
 
   const togglePause = () => {
     setIsPaused((prev) => !prev);
-  };
+  };   
 
   const drawBall = (ctx, ball) => {
     ctx.beginPath();
@@ -65,18 +66,38 @@ const PongGame = ({ mode, onReturnToMenu }) => {
   const drawScore = useCallback((ctx) => {
     ctx.font = '30px Arial';
     ctx.fillStyle = '#0095DD';
-    const scoreText = mode === 'solo' ? `Score: ${score.player1}` : `${score.player2} : ${score.player1}`;
+    const scoreText = mode === 'solo' ? `${score.player1}` : `${score.player2} : ${score.player1}`;
     ctx.fillText(scoreText, 280, 450);
   }, [mode, score]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'ArrowLeft') setPaddle1((paddle) => ({ ...paddle, x: Math.max(paddle.x - 50, 0) }));
-    else if (e.key === 'ArrowRight') setPaddle1((paddle) => ({ ...paddle, x: Math.min(paddle.x + 25, 600 - paddle.width) }));
+    else if (e.key === 'ArrowRight') setPaddle1((paddle) => ({ ...paddle, x: Math.min(paddle.x + 50, 600 - paddle.width) }));
     else if (e.key === 'a' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.max(paddle.x - 50, 0) }));
     else if (e.key === 'd' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.min(paddle.x + 50, 600 - paddle.width) }));
     else if (e.key === ' ') togglePause();
   }, [mode]);
 
+  const handleTouchStart = (event) => {
+    // Get the initial touch position on the X-axis
+    setTouchStartX(event.touches[0].clientX);
+  };
+  const handleTouchMove = (event) => {
+    if (touchStartX !== null) {
+      const touchX = event.touches[0].clientX; // Current touch position on X-axis
+      const deltaX = touchX - touchStartX; // Movement difference
+      
+      // Move paddle1 horizontally based on touch movement
+      setPaddle1((prev) => ({
+        ...prev,
+        x: Math.min(Math.max(prev.x + deltaX, 0), 600 - prev.width), // Keeping paddle within boundaries
+      }));
+      
+      // Update the starting position for continuous tracking
+      setTouchStartX(touchX);
+    }
+  };
+    
   const moveBall = useCallback((ball, paddle1, paddle2) => {
     let newBall = { ...ball };
     newBall.x += newBall.dx;
@@ -93,7 +114,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     if (newBall.y + newBall.dy > paddle1.y + 12 && newBall.y < paddle1.y + 15) {
       const crack = lineCracks.find(crack => crack.y === 'bottom' && newBall.x >= crack.x && newBall.x < crack.x + crack.width);
       if (crack && crack.width >= 20) {
-        alert("Game Over! Player 1 loses.");
+        alert("GAME OVER! Player 1 loses. Try again!");
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
@@ -104,7 +125,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     if (mode !== 'solo' && newBall.y + newBall.dy < paddle2.y + paddle2.height - 8 && newBall.y > paddle2.y + paddle2.height - 12) {
       const crack = lineCracks.find(crack => crack.y === 'top' && newBall.x >= crack.x && newBall.x < crack.x + crack.width);
       if (crack && crack.width >= 25) {
-        alert("Game Over! Player 2 loses.");
+        alert("GAME OVER! Player 2 loses. Try again!");
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
@@ -129,26 +150,33 @@ const PongGame = ({ mode, onReturnToMenu }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
+  
+    // Attach keyboard event listener
     window.addEventListener('keydown', handleKeyDown);
-
+  
+    // Attach touch event listeners to the canvas
+    canvas.addEventListener('touchstart', handleTouchStart);
+    canvas.addEventListener('touchmove', handleTouchMove);
+  
+    // Game update interval
     const interval = setInterval(() => {
-      if (!isPaused) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setBall((prevBall) => moveBall(prevBall, paddle1, paddle2));
-        drawBall(ctx, ball);
-        drawPaddle(ctx, paddle1, score.player1);
-        if (mode !== 'solo') drawPaddle(ctx, paddle2, score.player2);
-        drawScore(ctx);
-        drawBoundaryLines(ctx);
-      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setBall((prevBall) => moveBall(prevBall, paddle1, paddle2));
+      drawBall(ctx, ball);
+      drawPaddle(ctx, paddle1, score.player1);
+      if (mode !== 'solo') drawPaddle(ctx, paddle2, score.player2);
+      drawScore(ctx);
+      drawBoundaryLines(ctx);
     }, 10);
-
+  
+    // Cleanup function
     return () => {
       clearInterval(interval);
       window.removeEventListener('keydown', handleKeyDown);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [ball, paddle1, paddle2, score, isPaused, mode, lineCracks, handleKeyDown, moveBall, drawScore, drawBoundaryLines, drawPaddle]);
+  }, [ball, paddle1, paddle2, score, mode, handleKeyDown, handleTouchStart, handleTouchMove, moveBall, drawScore, drawBoundaryLines, drawPaddle]);  
 
   return (
     <div className="pong-container">

@@ -2,12 +2,11 @@ import React from 'react';
 import './CoverPage.css';
 import { TonConnectButton } from "@tonconnect/ui-react";
 
-
 const CoverPage = ({ onSelectMode }) => {
   return (
     <div className="cover-page">
       <header style={{display: 'flex', justifyContent: 'space-between'}}>
-          <TonConnectButton />
+        <TonConnectButton />
       </header>
       <h1>Welcome to Pong on $TON</h1>
       <p>Select your playing mode:</p>
