@@ -40,11 +40,11 @@ canvas {
 
 /* Specific positioning for top and bottom arrow containers */
 .control-icons-top {
-  top: 20px; /* Adjust as needed for spacing from the top */
+  top: -35px; /* Adjust as needed for spacing from the top */
 }
 
 .control-icons-bottom {
-  bottom: 20px; /* Adjust as needed for spacing from the bottom */
+  bottom: -5px; /* Adjust as needed for spacing from the bottom */
 }
 
 /* Fullscreen Pause Overlay */

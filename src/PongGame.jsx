@@ -79,24 +79,39 @@ const PongGame = ({ mode, onReturnToMenu }) => {
   }, [mode]);
 
   const handleTouchStart = (event) => {
-    // Get the initial touch position on the X-axis
-    setTouchStartX(event.touches[0].clientX);
-  };
-  const handleTouchMove = (event) => {
-    if (touchStartX !== null) {
-      const touchX = event.touches[0].clientX; // Current touch position on X-axis
-      const deltaX = touchX - touchStartX; // Movement difference
-      
-      // Move paddle1 horizontally based on touch movement
+  const touchY = event.touches[0].clientY;
+  const touchX = event.touches[0].clientX;
+
+  // Determine which paddle to control based on the Y position of the touch
+  if (touchY < window.innerHeight / 2 && mode !== 'solo') {
+    setTouchStartX({ paddle: 'paddle2', x: touchX });
+  } else {
+    setTouchStartX({ paddle: 'paddle1', x: touchX });
+  }
+};
+
+const handleTouchMove = (event) => {
+  if (touchStartX !== null) {
+    const touchX = event.touches[0].clientX;
+    const deltaX = touchX - touchStartX.x;
+
+    // Move the appropriate paddle based on the initial touch position
+    if (touchStartX.paddle === 'paddle1') {
       setPaddle1((prev) => ({
         ...prev,
-        x: Math.min(Math.max(prev.x + deltaX, 0), 600 - prev.width), // Keeping paddle within boundaries
+        x: Math.min(Math.max(prev.x + deltaX, 0), 600 - prev.width),
       }));
-      
-      // Update the starting position for continuous tracking
-      setTouchStartX(touchX);
+    } else if (touchStartX.paddle === 'paddle2') {
+      setPaddle2((prev) => ({
+        ...prev,
+        x: Math.min(Math.max(prev.x + deltaX, 0), 600 - prev.width),
+      }));
     }
-  };
+
+    // Update the starting position for continuous tracking
+    setTouchStartX((prev) => ({ ...prev, x: touchX }));
+  }
+};
     
   const moveBall = useCallback((ball, paddle1, paddle2) => {
     let newBall = { ...ball };
@@ -182,16 +197,16 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     <div className="pong-container">
       {mode !== 'solo' && (
         <div className="control-icons-container control-icons-top">
-          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.max(prev.x - 25, 0) }))}>⬅️</span>
-          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.min(prev.x + 25, 600 - paddle2.width) }))}>➡️</span>
+          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.max(prev.x - 35, 0) }))}>⬅️</span>
+          <span className="control-icon" onClick={() => setPaddle2((prev) => ({ ...prev, x: Math.min(prev.x + 35, 600 - paddle2.width) }))}>➡️</span>
         </div>
       )}
 
       <canvas ref={canvasRef} width="600" height="900" />
 
       <div className="control-icons-container control-icons-bottom">
-        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.max(prev.x - 25, 0) }))}>⬅️</span>
-        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.min(prev.x + 25, 600 - paddle1.width) }))}>➡️</span>
+        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.max(prev.x - 35, 0) }))}>⬅️</span>
+        <span className="control-icon" onClick={() => setPaddle1((prev) => ({ ...prev, x: Math.min(prev.x + 35, 600 - paddle1.width) }))}>➡️</span>
       </div>
 
       {isPaused && (
