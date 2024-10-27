@@ -4,8 +4,8 @@ import './PongGame.css';
 const PongGame = ({ mode, onReturnToMenu }) => {
   const canvasRef = useRef(null);
   const [ball, setBall] = useState({ x: 300, y: 450, dx: 4, dy: 4 });
-  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 100, height: 10 });
-  const [paddle2, setPaddle2] = useState({ x: 250, y: 20, width: 100, height: 10 });
+  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 100, height: 30 });
+  const [paddle2, setPaddle2] = useState({ x: 250, y: 0, width: 100, height: 30 });
   const [score, setScore] = useState({ player1: 0, player2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [lineCracks, setLineCracks] = useState([]);
@@ -29,8 +29,8 @@ const PongGame = ({ mode, onReturnToMenu }) => {
     ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
     ctx.fillStyle = '#0095DD';
 
-    ctx.strokeStyle = playerScore >= 50 ? 'white' : playerScore >= 25 ? 'yellow' : playerScore >= 10 ? 'white' : 'transparent';
-    ctx.lineWidth = playerScore >= 50 ? 9 : playerScore >= 25 ? 6 : playerScore >= 10 ? 4 : 0;
+    ctx.strokeStyle = playerScore >= 100 ? 'purple' : playerScore >= 50 ? 'red' : playerScore >= 25 ? 'blue' : playerScore >= 10 ? 'white' : 'transparent';
+    ctx.lineWidth = playerScore >= 100 ? '30' : playerScore >= 50 ? 24 : playerScore >= 25 ? 16 : playerScore >= 10 ? 8 : 0;
 
     ctx.fill();
     ctx.stroke();
@@ -39,8 +39,8 @@ const PongGame = ({ mode, onReturnToMenu }) => {
 
   const drawBoundaryLines = useCallback((ctx) => {
     const lineWidth = 600;
-    ctx.strokeStyle = 'orange';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'yellow';
+    ctx.lineWidth = 12;
 
     ctx.beginPath();
     for (let x = 0; x < lineWidth; x += 3) {
@@ -63,17 +63,17 @@ const PongGame = ({ mode, onReturnToMenu }) => {
   }, [lineCracks, mode, paddle1.y, paddle2.y, paddle2.height]);
 
   const drawScore = useCallback((ctx) => {
-    ctx.font = '24px Arial';
+    ctx.font = '30px Arial';
     ctx.fillStyle = '#0095DD';
     const scoreText = mode === 'solo' ? `Score: ${score.player1}` : `${score.player2} : ${score.player1}`;
     ctx.fillText(scoreText, 280, 450);
   }, [mode, score]);
 
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'ArrowLeft') setPaddle1((paddle) => ({ ...paddle, x: Math.max(paddle.x - 25, 0) }));
+    if (e.key === 'ArrowLeft') setPaddle1((paddle) => ({ ...paddle, x: Math.max(paddle.x - 50, 0) }));
     else if (e.key === 'ArrowRight') setPaddle1((paddle) => ({ ...paddle, x: Math.min(paddle.x + 25, 600 - paddle.width) }));
-    else if (e.key === 'a' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.max(paddle.x - 25, 0) }));
-    else if (e.key === 'd' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.min(paddle.x + 25, 600 - paddle.width) }));
+    else if (e.key === 'a' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.max(paddle.x - 50, 0) }));
+    else if (e.key === 'd' && mode !== 'solo') setPaddle2((paddle) => ({ ...paddle, x: Math.min(paddle.x + 50, 600 - paddle.width) }));
     else if (e.key === ' ') togglePause();
   }, [mode]);
 
@@ -92,12 +92,12 @@ const PongGame = ({ mode, onReturnToMenu }) => {
 
     if (newBall.y + newBall.dy > paddle1.y + 12 && newBall.y < paddle1.y + 15) {
       const crack = lineCracks.find(crack => crack.y === 'bottom' && newBall.x >= crack.x && newBall.x < crack.x + crack.width);
-      if (crack && crack.width >= 25) {
+      if (crack && crack.width >= 20) {
         alert("Game Over! Player 1 loses.");
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
-        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'bottom', width: 5 }]);
+        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'bottom', width: 22 }]);
       }
     }
 
@@ -108,7 +108,7 @@ const PongGame = ({ mode, onReturnToMenu }) => {
         onReturnToMenu();
       } else {
         newBall.dy = -newBall.dy;
-        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'top', width: 5 }]);
+        setLineCracks((prevCracks) => [...prevCracks, { x: newBall.x, y: 'top', width: 22 }]);
       }
     }
 
@@ -174,9 +174,11 @@ const PongGame = ({ mode, onReturnToMenu }) => {
         </div>
       )}
 
-      <button onClick={togglePause} className="pause-button">
-        {isPaused ? 'Resume' : 'Pause'}
-      </button>
+      {/*
+    <button onClick={togglePause} className="pause-button">
+      {isPaused ? 'Resume' : 'Pause'}
+    </button>
+    */}
     </div>
   );
 };

@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Simple_Pong_Game/static/css/main.14efe1f6.css",
+    "main.js": "/Simple_Pong_Game/static/js/main.1fcff137.js",
+    "static/js/453.5fc1480f.chunk.js": "/Simple_Pong_Game/static/js/453.5fc1480f.chunk.js",
+    "index.html": "/Simple_Pong_Game/index.html",
+    "main.14efe1f6.css.map": "/Simple_Pong_Game/static/css/main.14efe1f6.css.map",
+    "main.1fcff137.js.map": "/Simple_Pong_Game/static/js/main.1fcff137.js.map",
+    "453.5fc1480f.chunk.js.map": "/Simple_Pong_Game/static/js/453.5fc1480f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.14efe1f6.css",
+    "static/js/main.1fcff137.js"
+  ]
+}
