@@ -1,14 +1,14 @@
 html, body, #root {
   width: 100%;
   height: 100%;
+  margin: 0; /* Ensures no extra space around the body */
 }
 
 .App {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 1rem;
-  text-align: center;
+  width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0; /* Remove padding */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,28 +25,4 @@ html, body, #root {
   justify-content: center;
   font-size: calc(6px + 1.5vmin);
   color: white;
-}
-
-.App-logo {
-  height: 30vmin;
-  pointer-events: none;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
 }
