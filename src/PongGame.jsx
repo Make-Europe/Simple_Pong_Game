@@ -4,8 +4,8 @@ import './PongGame.css';
 const PongGame = ({ mode, onReturnToMenu }) => {
   const canvasRef = useRef(null);
   const [ball, setBall] = useState({ x: 300, y: 450, dx: 4, dy: 4 });
-  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 100, height: 33 });
-  const [paddle2, setPaddle2] = useState({ x: 250, y: 0, width: 100, height: 33 });
+  const [paddle1, setPaddle1] = useState({ x: 250, y: 870, width: 150, height: 33 });
+  const [paddle2, setPaddle2] = useState({ x: 250, y: 0, width: 150, height: 33 });
   const [score, setScore] = useState({ player1: 0, player2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [lineCracks, setLineCracks] = useState([]);
